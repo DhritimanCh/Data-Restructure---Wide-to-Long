@@ -1,0 +1,42 @@
+#Get your data and attach it.
+#We use the gather function of tidyr
+library(tidyr)
+
+#Create data frame of fixed variables
+Fixed<-data.frame(Sno,Age,Group,Name,Gender)
+#Create data frames of variables to be restructured. Take care each data frame should have same number of columns to be made into rows.
+ONSDL<-data.frame(SupLeftAvg,Pron0LeftAvg,Pron1LeftAvg,Pron2LeftAvg,Pron3LeftAvg,Pron4LeftAvg,Pron5LeftAvg,SupELeftAvg,HULeftAvg)
+ONSDR<-data.frame(SuprightAvg,Pron0rightAvg,Pron1rightAvg,Pron2rightAvg,Pron3rightAvg,Pron4rightAvg,Pron5rightAvg,SupErightAvg,HUrightAvg)
+SBP<-data.frame(SupSBP,Pron0SBP,Pron1SBP,Pron2SBP,Pron3SBP,Pron4SBP,Pron5SBP,SupESBP,HUSBP)
+DBP<-data.frame(SupDBP,Pron0DBP,Pron1DBP,Pron2DBP,Pron3DBP,Pron4DBP,Pron5DBP,SupEDBP,HUDBP)
+MAP<-data.frame(SupMAP,Pron0MAP,Pron1MAP,Pron2MAP,Pron3MAP,Pron4MAP,Pron5MAP,SupEMAP,HUMAP)
+HR<-data.frame(SupHR,Pron0HR,Pron1HR,Pron2HR,Pron3HR,Pron4HR,Pron5HR,SupEHR,HUHR)
+SPO2<-data.frame(SupSPO2,Pron0SPO2,Pron1SPO2,Pron2SPO2,Pron3SPO2,Pron4SPO2,Pron5SPO2,SupESPO2,HUSPO2)
+
+#Make a list of the data frames with first being the Fixed variables data frame.
+List<-list(Fixed,ONSDL,ONSDR,SBP,DBP,MAP,HR,SPO2)
+
+#Restructure syntax
+#The script first makes a restructured data frame of the fixed and second dataframe in the list. Then it loops through the other frames, restructuring and adding them to the first restructure. Then it adds a numerical index of variable level at the beginning of the final restructured frame, saves it as "Restructure Data.csv" and calls a view of the final dataframe.
+
+restruc<-function(x){
+One<-data.frame(data.frame(x[1]),data.frame(x[2]))
+N<-ncol(data.frame(x[1]))
+Nrow<-dim(data.frame(x[1]))[1]
+Index<-rep(1:ncol(data.frame(x[2])),each=Nrow)
+Name<-as.character(names(data.frame(x[2]))[1])
+Key<-names(data.frame(x[2]))
+R_Data<-gather(One,Key,Value,-(1:N))
+names(R_Data)[N+2]<-Name
+for(i in 1:(length(x)-2)){
+Two<-x[-c(1,2)]
+Name<-as.character(names(data.frame(Two[i]))[1])
+Key<-names(data.frame(Two[i]))
+D<-gather(data.frame(Two[i]),Key,Value)
+names(D)[2]<-Name
+R_Data<-data.frame(R_Data,D)}
+R_Data<-data.frame(Index,R_Data)
+write.csv(R_Data,file="Restructured Data.csv",row.names=FALSE)
+View(R_Data)}
+
+restruc(List)
